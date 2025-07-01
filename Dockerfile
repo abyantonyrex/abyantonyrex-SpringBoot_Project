@@ -1,14 +1,23 @@
-# Use official Java image
-FROM eclipse-temurin:17-jdk
-
-# Set working directory
+# Stage 1: Build the application
+FROM gradle:8.5.0-jdk17 AS builder
 WORKDIR /app
 
-# Copy the jar file (make sure this matches your jar name)
-COPY build/libs/AbyProject-0.0.1-SNAPSHOT.jar app.jar
+# Copy only necessary files for Gradle to cache dependencies
+COPY build.gradle settings.gradle ./
+COPY src ./src
 
-# Expose port 8080
+# Run build (skip tests)
+RUN gradle build -x test
+
+# Stage 2: Create a smaller image to run the app
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+
+# Copy the JAR from the builder stage
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+# Expose the port
 EXPOSE 8080
 
-# Start the app
+# Run the app
 ENTRYPOINT ["java", "-jar", "app.jar"]
