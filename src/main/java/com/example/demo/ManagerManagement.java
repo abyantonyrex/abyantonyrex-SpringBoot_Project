@@ -18,7 +18,7 @@ import com.example.demo.service.ManagerService;
 
 @RestController
 @RequestMapping("/manager")
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin(origins = "https://react-workouts-six.vercel.app")
 public class ManagerManagement {
   
 	@Autowired
